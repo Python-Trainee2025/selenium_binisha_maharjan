@@ -2,100 +2,77 @@ import pytest
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 
-
-@pytest.fixture
-def driver():
-    options = Options()
-    options.add_argument("--start-maximized")
-    service = Service()
-    driver = webdriver.Chrome(service=service, options=options)
-    driver.get("https://www.saucedemo.com/")
-    yield driver
-    driver.quit()
 
 
 @pytest.mark.parametrize(
     "username,password",
-    [
-        ("standard_user", "secret_sauce"),
-        ("problem_user", "secret_sauce"),
-        ("performance_glitch_user", "secret_sauce"),
-    ]
-)
-def test_saucedemo_flow(driver, username, password):
+    [("standard_user", "secret_sauce"),("problem_user", "secret_sauce"),("performance_glitch_user", "secret_sauce"),])
 
-    wait = WebDriverWait(driver, 30)
+def test_demo(username,password):
+    def test_demo(username, password):
+        chrome_options = Options()
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.maximize_window()
+        driver.get("https://www.saucedemo.com/")
+        time.sleep(3)
 
-    # -----------------------------------------------------
-    # LOGIN
-    # -----------------------------------------------------
-    wait.until(EC.visibility_of_element_located((By.ID, "user-name"))).send_keys(username)
-    time.sleep(1)
+        driver.find_element(By.ID, "user-name").send_keys(username)
+        driver.find_element(By.ID, "password").send_keys(password)
+        time.sleep(2)
+        driver.find_element(By.ID, "login-button").click()
+        time.sleep(2)
 
-    driver.find_element(By.ID, "password").send_keys(password)
-    time.sleep(1)
+        driver.find_element(By.ID, "add-to-cart-sauce-labs-backpack").click()
+        time.sleep(1)
+        driver.find_element(By.ID, "add-to-cart-sauce-labs-bike-light").click()
+        time.sleep(1)
+        driver.find_element(By.ID, "add-to-cart-sauce-labs-bolt-t-shirt").click()
+        time.sleep(1)
 
-    driver.find_element(By.ID, "login-button").click()
-    time.sleep(2)
+        driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()
+        time.sleep(2)
+        items = driver.find_elements(By.CLASS_NAME, "inventory_item_name")
+        cart_items = []
+        for i in items:
+            cart_items.append(i.text)
+        print(cart_items)
 
-    wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "title")))
+        # remove one item from the cart
+        driver.find_element(By.ID, "remove-sauce-labs-backpack").click()
+        time.sleep(2)
 
-    # -----------------------------------------------------
-    # ADD FIRST 2 ITEMS TO CART
-    # -----------------------------------------------------
-    add_buttons = wait.until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "button[id*='add-to-cart']"))
-    )
+        # Go back to the product page via menu
+        # driver.find_element(By.ID,"react-burger-menu-btn").click()
+        # time.sleep(2)
+        # driver.find_element(By.ID,"inventory_sidebar_link").click()
+        # time.sleep(2)
 
-    add_buttons[0].click()
-    time.sleep(1)
+        # goback to product page via continue shopping button
+        continue_shopping = driver.find_element(By.ID, "continue-shopping")
+        actions = ActionChains(driver)
+        actions.move_to_element(continue_shopping).click().perform()
+        time.sleep(2)
 
-    add_buttons[1].click()
-    time.sleep(1)
+        # Open a product detail page and add that product to the cart.
+        product = driver.find_element(By.CLASS_NAME, "inventory_item_name")
+        actions.move_to_element(product).click().perform()
+        time.sleep(2)
+        driver.find_element(By.ID, "add-to-cart").click()
+        time.sleep(2)
 
-    # -----------------------------------------------------
-    # OPEN CART
-    # -----------------------------------------------------
-    driver.find_element(By.ID, "shopping_cart_container").click()
-    time.sleep(1)
+        driver.quit()
 
-    cart_items = wait.until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "cart_item"))
-    )
 
-    # -----------------------------------------------------
-    # REMOVE ONE ITEM
-    # -----------------------------------------------------
-    remove_buttons = wait.until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "button[id*='remove']"))
-    )
 
-    remove_buttons[0].click()
-    time.sleep(1)
 
-    # -----------------------------------------------------
-    # BACK TO PRODUCTS
-    # -----------------------------------------------------
-    wait.until(EC.element_to_be_clickable((By.ID, "continue-shopping"))).click()
-    time.sleep(1)
 
-    # -----------------------------------------------------
-    # OPEN PRODUCT DETAIL PAGE
-    # -----------------------------------------------------
-    wait.until(
-        EC.element_to_be_clickable((By.XPATH, "//div[text()='Sauce Labs Backpack']"))
-    ).click()
-    time.sleep(1)
 
-    # -----------------------------------------------------
-    # ADD PRODUCT FROM DETAIL PAGE
-    # -----------------------------------------------------
-    wait.until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "button[id*='add-to-cart']"))
-    ).click()
-    time.sleep(1)
+
+
+
+
+
+
+

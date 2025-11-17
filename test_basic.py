@@ -18,4 +18,6 @@ def test_demo():
     driver.find_element(By.ID,"login-button").click()
     wait = WebDriverWait(driver, 30)
     wait.until(ec.visibility_of_element_located((By.CLASS_NAME, "title")))
+
+
     driver.quit()

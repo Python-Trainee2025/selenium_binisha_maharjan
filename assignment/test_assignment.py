@@ -20,12 +20,7 @@ def driver():
 
 @pytest.mark.parametrize(
     "username,password",
-    [
-        ("standard_user", "secret_sauce"),
-        ("problem_user", "secret_sauce"),
-        ("performance_glitch_user", "secret_sauce"),
-    ]
-)
+    [("standard_user", "secret_sauce"),("problem_user", "secret_sauce"),("performance_glitch_user", "secret_sauce"),])
 def test_saucedemo_flow(driver, username, password):
 
     wait = WebDriverWait(driver, 30)
@@ -45,37 +40,30 @@ def test_saucedemo_flow(driver, username, password):
     add_buttons[0].click()
     add_buttons[1].click()
 
-
-    # OPEN CART
     driver.find_element(By.ID, "shopping_cart_container").click()
 
-    # Verify 2 items in cart
     cart_items = wait.until(
         EC.presence_of_all_elements_located((By.CLASS_NAME, "cart_item"))
     )
     assert len(cart_items) >= 2
 
-    # REMOVE ONE ITEM
     remove_buttons = wait.until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, "button[id*='remove']"))
     )
     assert len(remove_buttons) >= 1
     remove_buttons[0].click()
 
-    # Verify 1 item left
     remaining_items = driver.find_elements(By.CLASS_NAME, "cart_item")
     assert len(remaining_items) == 1
 
-    # BACK TO PRODUCTS PAGE
     wait.until(EC.element_to_be_clickable((By.ID, "continue-shopping"))).click()
 
-    # OPEN PRODUCT DETAIL PAGE
     wait.until(
         EC.element_to_be_clickable((By.XPATH, "//div[text()='Sauce Labs Backpack']"))
     ).click()
 
 
-    # ADD PRODUCT FROM DETAIL PAGE
+
     wait.until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, "button[id*='add-to-cart']"))
     ).click()
